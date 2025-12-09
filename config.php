@@ -23,7 +23,6 @@ try {
     die("DB connection failed: " . htmlspecialchars($e->getMessage()));
 }
 
-// Auth helpers
 function is_logged_in() {
     return isset($_SESSION['user_id']);
 }
@@ -34,3 +33,4 @@ function current_user($pdo) {
     $stmt->execute([$_SESSION['user_id']]);
     return $stmt->fetch();
 }
+

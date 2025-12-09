@@ -1,145 +1,85 @@
-# Video Platform Deployment README
+## 📌 Projectomschrijving
 
-## 1️⃣ Vereisten
+Dit project is een **eenvoudig video--beheerplatform** waarin gebruikers
+YouTube-video's kunnen opslaan per categorie.\
+Het is bedoeld voor **gebruikers die snel video's willen groeperen,
+openen, aanpassen en delen** binnen een overzichtelijke interface.
 
-* Webserver: Nginx of Apache
-* PHP: ≥ 8.0 (met PDO MySQL extension)
-* MySQL/MariaDB
-* Git (optioneel)
-* Composer (optioneel)
+Daarnaast kunnen **admins categorieën beheren**, terwijl normale
+gebruikers enkel video's kunnen toevoegen, bewerken of verwijderen
+binnen hun eigen account.\
+Het project lost het probleem op dat YouTube-links vaak overal verspreid
+staan: dit platform centraliseert ze en maakt ze beheersbaar.
 
-## 2️⃣ Projectstructuur
+------------------------------------------------------------------------
 
-```
-video_platform/
-├─ index.php
-├─ category.php
-├─ add_video.php
-├─ edit_video.php
-├─ delete_video.php
-├─ login.php
-├─ register.php
-├─ logout.php
-├─ config.php
-├─ assets/
-│  ├─ style.css
-│  └─ app.js
-├─ db.sql
-└─ README.md
-```
+## ⭐ Functionaliteiten
 
-## 3️⃣ Database Setup
+-   Inloggen, registreren en uitloggen\
+-   Video's toevoegen met titel, YouTube-URL en optionele thumbnail\
+-   Video's bewerken en verwijderen (gebruiker of admin)\
+-   Categorieën aanmaken (alleen admin)\
+-   Overzichtelijke categoriepagina met alle video's\
+-   Automatische thumbnail-detectie wanneer geen eigen thumbnail is
+    opgegeven\
+-   Moderne UI: grid-cards, modals, glassmorphism-design\
+-   Carousel banner op categoriepagina\
+-   Link-kopieerfunctie en directe video-openknop\
+-   AJAX-functionaliteit voor add/edit/delete van video's
 
-1. Maak de database en tabellen aan met db.sql:
+------------------------------------------------------------------------
 
-```bash
-mysql -u root -p < db.sql
-```
+## 🛠 Installatie-instructies
 
-2. Pas config.php aan met jouw database credentials:
+### 1. Vereisten
 
-```php
-$DB_HOST = 'localhost';
-$DB_NAME = 'video_platform';
-$DB_USER = 'jouw_db_user';
-$DB_PASS = 'jouw_db_password';
-```
+-   PHP 8+
+-   MySQL/MariaDB
+-   Een lokale server zoals XAMPP, WAMP, Laragon of MAMP
 
-3. Voeg admin-veld toe aan users-tabel als dit nog niet bestaat:
+------------------------------------------------------------------------
 
-```sql
-ALTER TABLE users ADD COLUMN is_admin TINYINT(1) DEFAULT 0;
-```
+### 2. Project installeren
 
-4. Admin gebruiker aanmaken (optioneel):
+1.  Plaats alle bestanden in je lokale servermap, bijvoorbeeld:\
+    `htdocs/video-platform/`
+2.  Controleer dat `config.php` de juiste database-inloggegevens bevat.
 
-```sql
-INSERT INTO users (username, password_hash, display_name, is_admin)
-VALUES ('admin', '<hash>', 'Administrator', 1);
-```
+------------------------------------------------------------------------
 
-> Voor `<hash>` kun je een PHP-script gebruiken:
+### 3. Database importeren
 
-```php
-<?php
- echo password_hash('jouw_admin_password', PASSWORD_DEFAULT);
-```
+1.  Open **phpMyAdmin**\
 
-## 4️⃣ Webserver Setup
+2.  Maak een lege database aan met de naam:
 
-### Nginx (PHP-FPM)
+        video_platform
 
-```nginx
-server {
-    listen 80;
-    server_name jouwdomein.com;
-    root /var/www/video_platform;
+3.  Ga naar *Import*\
 
-    index index.php;
+4.  Selecteer het bestand:\
+    **db.sql**\
 
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
+5.  Voer de import uit.
 
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
-    }
+------------------------------------------------------------------------
 
-    location ~ /\.ht {
-        deny all;
-    }
-}
-```
+### 4. Belangrijke mappen & instellingen
 
-### Apache
+-   `assets/` → bevat CSS, JS en afbeeldingen\
+-   `assets/app.js` → functies voor modals, videoacties en carousel\
+-   `assets/style.css` → styling voor alle pagina's\
+-   Zorg dat sessies werken in PHP\
+-   Zorg dat `config.php` correcte databasegegevens bevat
 
-```apache
-<VirtualHost *:80>
-    ServerName jouwdomein.com
-    DocumentRoot /var/www/video_platform
+------------------------------------------------------------------------
 
-    <Directory /var/www/video_platform>
-        AllowOverride All
-        Require all granted
-    </Directory>
+## 🧰 Technieken die gebruikt zijn
 
-    <FilesMatch \.php$>
-        SetHandler "proxy:unix:/run/php/php8.1-fpm.sock|fcgi://localhost/"
-    </FilesMatch>
-</VirtualHost>
-```
-
-## 5️⃣ Bestandenrechten
-
-```bash
-sudo chown -R www-data:www-data /var/www/video_platform
-sudo find /var/www/video_platform -type d -exec chmod 755 {} \;
-sudo find /var/www/video_platform -type f -exec chmod 644 {} \;
-```
-
-> `www-data` is meestal de webserver gebruiker.
-
-## 6️⃣ Frontend / Assets
-
-* CSS: assets/style.css
-* JS: assets/app.js
-
-> Zorg dat deze bestanden leesbaar zijn door de webserver.
-
-## 7️⃣ Admin Functionaliteiten
-
-1. Categorie aanmaken/verwijderen: via database of admin pagina.
-2. Video verwijderen/edit: beschikbaar voor admin of auteur.
-3. User management: handmatig via database voor nu.
-
-## 8️⃣ Toegang tot de app
-
-1. Ga naar `http://localhost/` of jouw domein
-2. Registreren of inloggen
-3. Admin ziet extra knoppen voor edit/delete
-4. Klik op categorie om video’s te bekijken
-5. Voeg video’s toe via modal
-
-## 9️⃣ Tips voor Veiligheid
-* Database gebruiker: geef alleen benodigde rechten
+-   **PHP** --- backend, authenticatie, form-afhandeling\
+-   **MySQL** --- database voor gebruikers, categorieën en video's\
+-   **HTML5 / CSS3** --- interface, responsive layout, glassmorphism\
+-   **JavaScript (ES6)** --- modals, AJAX-requests, copy-to-clipboard,
+    carousel\
+-   **Fetch API** --- asynchronous CRUD-acties voor video's\
+-   **PDO** --- veilige database-communicatie met prepared statements
